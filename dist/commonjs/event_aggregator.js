@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const debug = require("debug");
 const debugError = debug('event_aggregator:error');
 class EventAggregator {
