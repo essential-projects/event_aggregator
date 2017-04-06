@@ -1,10 +1,11 @@
-import {EventEmitter} from 'events';
-import {IEventAggregator, ISubscription} from '@process-engine-js/event_aggregator_contracts';
+import {ExecutionContext, IEntity} from '@process-engine-js/core_contracts';
+import {IEventAggregator, ISubscription, IEntityEvent, IEventMetadata} from '@process-engine-js/event_aggregator_contracts';
 import * as debug from 'debug';
+import * as uuid from 'uuid';
 
 const debugError = debug('event_aggregator:error');
 
-export class EventAggregator {
+export class EventAggregator implements IEventAggregator {
 
   private eventLookup = {};
   private messageHandlers = [];
@@ -74,22 +75,52 @@ export class EventAggregator {
 
     return subscription;
   }
+
+
+  public createEntityEvent(data: any, source: IEntity, context: ExecutionContext): IEntityEvent {
+
+    const metadata = this._createEventMetadata(context);
+
+    const message = {
+      metadata: metadata,
+      data: data,
+      source: source
+    };
+
+    return message;
+  }
+
+
+  private _createEventMetadata(context: ExecutionContext): IEventMetadata {
+
+    const metadata = {
+      id: uuid.v4(),
+      context: context
+    };
+
+    return metadata;
+  }
 }
 
 function invokeCallback(callback, data, event) {
-  try {
-    callback(data, event);
-  } catch (e) {
-    debugError(e);
-  }
+  process.nextTick(() => {
+    try {
+      callback(data, event);
+    } catch (e) {
+      debugError(e);
+    }
+  });
+  
 }
 
 function invokeHandler(handler, data) {
-  try {
-    handler.handle(data);
-  } catch (e) {
-    debugError(e);
-  }
+  process.nextTick(() => {
+    try {
+      handler.handle(data);
+    } catch (e) {
+      debugError(e);
+    }
+  });
 }
 
 class Handler {

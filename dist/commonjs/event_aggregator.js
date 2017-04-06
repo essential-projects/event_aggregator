@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const debug = require("debug");
+const uuid = require("uuid");
 const debugError = debug('event_aggregator:error');
 class EventAggregator {
     constructor() {
@@ -62,23 +63,43 @@ class EventAggregator {
         });
         return subscription;
     }
+    createEntityEvent(data, source, context) {
+        const metadata = this._createEventMetadata(context);
+        const message = {
+            metadata: metadata,
+            data: data,
+            source: source
+        };
+        return message;
+    }
+    _createEventMetadata(context) {
+        const metadata = {
+            id: uuid.v4(),
+            context: context
+        };
+        return metadata;
+    }
 }
 exports.EventAggregator = EventAggregator;
 function invokeCallback(callback, data, event) {
-    try {
-        callback(data, event);
-    }
-    catch (e) {
-        debugError(e);
-    }
+    process.nextTick(() => {
+        try {
+            callback(data, event);
+        }
+        catch (e) {
+            debugError(e);
+        }
+    });
 }
 function invokeHandler(handler, data) {
-    try {
-        handler.handle(data);
-    }
-    catch (e) {
-        debugError(e);
-    }
+    process.nextTick(() => {
+        try {
+            handler.handle(data);
+        }
+        catch (e) {
+            debugError(e);
+        }
+    });
 }
 class Handler {
     constructor(messageType, callback) {
