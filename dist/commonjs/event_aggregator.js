@@ -63,8 +63,8 @@ class EventAggregator {
         });
         return subscription;
     }
-    createEntityEvent(data, source, context) {
-        const metadata = this._createEventMetadata(context);
+    createEntityEvent(data, source, context, metadataOptions) {
+        const metadata = this._createEventMetadata(context, metadataOptions);
         const message = {
             metadata: metadata,
             data: data,
@@ -72,10 +72,11 @@ class EventAggregator {
         };
         return message;
     }
-    _createEventMetadata(context) {
+    _createEventMetadata(context, metadataOptions) {
         const metadata = {
             id: uuid.v4(),
-            context: context
+            context: context,
+            options: metadataOptions
         };
         return metadata;
     }

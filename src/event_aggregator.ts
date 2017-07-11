@@ -77,9 +77,9 @@ export class EventAggregator implements IEventAggregator {
   }
 
 
-  public createEntityEvent(data: any, source: IEntity, context: ExecutionContext): IEntityEvent {
+  public createEntityEvent(data: any, source: IEntity, context: ExecutionContext, metadataOptions?: { [key: string]: any }): IEntityEvent {
 
-    const metadata = this._createEventMetadata(context);
+    const metadata = this._createEventMetadata(context, metadataOptions);
 
     const message = {
       metadata: metadata,
@@ -91,11 +91,12 @@ export class EventAggregator implements IEventAggregator {
   }
 
 
-  private _createEventMetadata(context: ExecutionContext): IEventMetadata {
+  private _createEventMetadata(context: ExecutionContext, metadataOptions?: { [key: string]: any }): IEventMetadata {
 
-    const metadata = {
+    const metadata: IEventMetadata = {
       id: uuid.v4(),
-      context: context
+      context: context,
+      options: metadataOptions
     };
 
     return metadata;
