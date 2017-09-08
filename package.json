@@ -20,7 +20,7 @@
     "uuid": "^3.0.1"
   },
   "devDependencies": {
-    "@process-engine-js/gulptraum": "^1.2.5",
+    "gulptraum": "^2.2.1",
     "gulp": "^3.9.1",
     "tsconfig": "^7.0.0"
   }
