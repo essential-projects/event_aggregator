@@ -20,8 +20,11 @@
     "uuid": "^3.0.1"
   },
   "devDependencies": {
-    "gulptraum": "^2.2.1",
+    "@process-engine-js/tslint-config": "^1.0.0",
     "gulp": "^3.9.1",
-    "tsconfig": "^7.0.0"
+    "gulptraum": "^2.2.1",
+    "tsconfig": "^7.0.0",
+    "tslint": "^5.7.0",
+    "typescript": "^2.5.2"
   }
 }
