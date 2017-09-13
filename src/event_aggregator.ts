@@ -1,5 +1,5 @@
 import {ExecutionContext, IEntity} from '@process-engine-js/core_contracts';
-import {IEventAggregator, ISubscription, IEntityEvent, IEventMetadata} from '@process-engine-js/event_aggregator_contracts';
+import {IEntityEvent, IEventAggregator, IEventMetadata, ISubscription} from '@process-engine-js/event_aggregator_contracts';
 import * as debug from 'debug';
 import * as uuid from 'uuid';
 
@@ -58,16 +58,16 @@ export class EventAggregator implements IEventAggregator {
 
     return {
       dispose() {
-        let index = subscribers.indexOf(handler);
+        const index = subscribers.indexOf(handler);
         if (index !== -1) {
           subscribers.splice(index, 1);
         }
-      }
+      },
     };
   }
 
   public subscribeOnce(event: string | Function, callback: Function): ISubscription {
-    
+
     const subscription = this.subscribe(event, (a, b) => {
       subscription.dispose();
       return callback(a, b);
@@ -76,7 +76,6 @@ export class EventAggregator implements IEventAggregator {
     return subscription;
   }
 
-
   public createEntityEvent(data: any, source: IEntity, context: ExecutionContext, metadataOptions?: { [key: string]: any }): IEntityEvent {
 
     const metadata = this._createEventMetadata(context, metadataOptions);
@@ -84,19 +83,18 @@ export class EventAggregator implements IEventAggregator {
     const message = {
       metadata: metadata,
       data: data,
-      source: source
+      source: source,
     };
 
     return message;
   }
-
 
   private _createEventMetadata(context: ExecutionContext, metadataOptions?: { [key: string]: any }): IEventMetadata {
 
     const metadata: IEventMetadata = {
       id: uuid.v4(),
       context: context,
-      options: metadataOptions
+      options: metadataOptions,
     };
 
     return metadata;
@@ -111,7 +109,7 @@ function invokeCallback(callback, data, event) {
       debugError(e);
     }
   });
-  
+
 }
 
 function invokeHandler(handler, data) {
@@ -134,7 +132,7 @@ class Handler {
     this.callback = callback;
   }
 
-  handle(message) {
+  public handle(message) {
     if (message instanceof this.messageType) {
       this.callback.call(null, message);
     }
