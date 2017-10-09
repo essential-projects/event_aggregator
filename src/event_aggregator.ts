@@ -1,5 +1,5 @@
-import {ExecutionContext, IEntity} from '@process-engine-js/core_contracts';
-import {IEntityEvent, IEventAggregator, IEventMetadata, ISubscription} from '@process-engine-js/event_aggregator_contracts';
+import {ExecutionContext, IEntity} from '@essential-projects/core_contracts';
+import {IEntityEvent, IEventAggregator, IEventMetadata, ISubscription} from '@essential-projects/event_aggregator_contracts';
 import * as debug from 'debug';
 import * as uuid from 'uuid';
 
