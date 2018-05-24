@@ -3,6 +3,8 @@ import {IEntityEvent, IEventAggregator, IEventMetadata, ISubscription} from '@es
 import * as debug from 'debug';
 import * as uuid from 'uuid';
 
+// tslint:disable:typedef
+// tslint:disable:max-classes-per-file
 const debugError = debug('event_aggregator:error');
 
 export class EventAggregator implements IEventAggregator {
@@ -70,13 +72,18 @@ export class EventAggregator implements IEventAggregator {
 
     const subscription = this.subscribe(event, (a, b) => {
       subscription.dispose();
+
       return callback(a, b);
     });
 
     return subscription;
   }
 
-  public createEntityEvent(data: any, source: IEntity, context: ExecutionContext, metadataOptions?: { [key: string]: any }): IEntityEvent {
+  public createEntityEvent(data: any,
+                           source: IEntity,
+                           context: ExecutionContext,
+                           metadataOptions?: {[key: string]: any},
+                          ): IEntityEvent {
 
     const metadata = this._createEventMetadata(context, metadataOptions);
 
