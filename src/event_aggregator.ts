@@ -84,7 +84,7 @@ export class EventAggregator implements IEventAggregator {
                            metadataOptions?: {[key: string]: any},
                           ): IEntityEvent {
 
-    const metadata = this._createEventMetadata(context, metadataOptions);
+    const metadata = this._createEventMetadata(metadataOptions);
 
     const message = {
       metadata: metadata,
