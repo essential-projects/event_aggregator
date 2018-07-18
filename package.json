@@ -15,7 +15,6 @@
   ],
   "dependencies": {
     "@essential-projects/event_aggregator_contracts": "feature~remove_old_datastore_implementation",
-    "@essential-projects/iam_contracts": "^3.0.0",
     "debug": "^2.6.1",
     "uuid": "^3.0.1"
   },

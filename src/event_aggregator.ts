@@ -1,5 +1,4 @@
 import {IEntityEvent, IEventAggregator, IEventMetadata, ISubscription} from '@essential-projects/event_aggregator_contracts';
-import {ExecutionContext} from '@essential-projects/iam_contracts';
 
 import * as debug from 'debug';
 import * as uuid from 'uuid';
@@ -82,7 +81,6 @@ export class EventAggregator implements IEventAggregator {
 
   public createEntityEvent(data: any,
                            source: any,
-                           context: ExecutionContext,
                            metadataOptions?: {[key: string]: any},
                           ): IEntityEvent {
 
@@ -97,11 +95,10 @@ export class EventAggregator implements IEventAggregator {
     return message;
   }
 
-  private _createEventMetadata(context: ExecutionContext, metadataOptions?: { [key: string]: any }): IEventMetadata {
+  private _createEventMetadata(metadataOptions?: { [key: string]: any }): IEventMetadata {
 
     const metadata: IEventMetadata = {
       id: uuid.v4(),
-      context: context,
       options: metadataOptions,
     };
 
