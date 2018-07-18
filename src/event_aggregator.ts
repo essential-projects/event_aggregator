@@ -1,5 +1,6 @@
-import {ExecutionContext, IEntity} from '@essential-projects/core_contracts';
 import {IEntityEvent, IEventAggregator, IEventMetadata, ISubscription} from '@essential-projects/event_aggregator_contracts';
+import {ExecutionContext} from '@essential-projects/iam_contracts';
+
 import * as debug from 'debug';
 import * as uuid from 'uuid';
 
@@ -80,7 +81,7 @@ export class EventAggregator implements IEventAggregator {
   }
 
   public createEntityEvent(data: any,
-                           source: IEntity,
+                           source: any,
                            context: ExecutionContext,
                            metadataOptions?: {[key: string]: any},
                           ): IEntityEvent {
