@@ -1,6 +1,7 @@
 import {Logger} from 'loggerhythm';
 import * as uuid from 'uuid';
 
+import {BadRequestError} from '@essential-projects/errors_ts';
 import {EventReceivedCallback, IEventAggregator, Subscription} from '@essential-projects/event_aggregator_contracts';
 
 import {EventSubscriptionDictionary, IInternalSubscription, SubscriberCollection} from './internal_types';
@@ -49,7 +50,11 @@ export class EventAggregator implements IEventAggregator {
   private _createSubscription(event: string, callback: EventReceivedCallback, subscribeOnce: boolean): Subscription {
 
     if (!event) {
-      throw new Error('Event name is invalid.');
+      throw new BadRequestError('No event name provided for the subscription!');
+    }
+
+    if (!callback) {
+      throw new BadRequestError('No callback function provided for the subscription!');
     }
 
     const subscriptionId: string = uuid.v4();
