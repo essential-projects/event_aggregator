@@ -90,5 +90,4 @@ function invokeEventCallback(eventName: string, eventPayload: any, callback: Fun
       logger.error(e);
     }
   });
-
 }
