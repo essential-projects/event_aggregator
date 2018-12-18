@@ -65,7 +65,7 @@ export class EventAggregator implements IEventAggregator {
       this.eventSubscriptionDictionary[event] = {};
     }
 
-    this.eventSubscriptionDictionary[event][subscriptionId] = {
+    this.eventSubscriptionDictionary[event][subscriptionId] = <IInternalSubscription> {
       subscribeOnce: subscribeOnce,
       callback: callback,
     };
