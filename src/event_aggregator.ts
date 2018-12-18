@@ -24,7 +24,7 @@ export class EventAggregator implements IEventAggregator {
 
     const noSubscribersForEventExist: boolean =
       !this.eventSubscriptionDictionary[eventName] ||
-      Object.keys(!this.eventSubscriptionDictionary[eventName]).length === 0;
+      Object.keys(this.eventSubscriptionDictionary[eventName]).length === 0;
     if (noSubscribersForEventExist) {
       return;
     }
