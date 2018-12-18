@@ -27,12 +27,12 @@ import {EventReceivedCallback} from '@essential-projects/event_aggregator_contra
 export type EventSubscriptionDictionary = {[eventName: string]: SubscriberCollection};
 
 /**
- * Internal type for storing a Subscription under a specified ID.
+ * Internal type for grouping together multiple subscriptions for a specific event.
  */
 export type SubscriberCollection = {[subscriberId: string]: IInternalSubscription};
 
 /**
- * Internal type that describes a event subscription.
+ * Internal interface that describes a single subscription.
  */
 export interface IInternalSubscription {
   subscribeOnce: boolean;
