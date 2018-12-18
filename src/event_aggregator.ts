@@ -1,145 +1,93 @@
-import {IEntityEvent, IEventAggregator, IEventMetadata, ISubscription} from '@essential-projects/event_aggregator_contracts';
-
-import * as debug from 'debug';
+import {Logger} from 'loggerhythm';
 import * as uuid from 'uuid';
 
-// tslint:disable:typedef
-// tslint:disable:max-classes-per-file
-const debugError = debug('event_aggregator:error');
+import {BadRequestError} from '@essential-projects/errors_ts';
+import {EventReceivedCallback, IEventAggregator, Subscription} from '@essential-projects/event_aggregator_contracts';
+
+import {EventSubscriptionDictionary, IInternalSubscription, SubscriberCollection} from './internal_types';
+
+const logger: Logger = Logger.createLogger('essential-projects:event_aggregator');
 
 export class EventAggregator implements IEventAggregator {
 
-  private eventLookup = {};
-  private messageHandlers = [];
+  private eventSubscriptionDictionary: EventSubscriptionDictionary = {};
 
-  public publish(event: string | any, data?: any): void {
-    let subscribers;
-    let i;
+  public subscribe(eventName: string, callback: EventReceivedCallback): Subscription {
+    return this._createSubscription(eventName, callback, false);
+  }
+
+  public subscribeOnce(eventName: string, callback: EventReceivedCallback): Subscription {
+    return this._createSubscription(eventName, callback, true);
+  }
+
+  public publish(eventName: string, payload?: any): void {
+
+    const noSubscribersForEventExist: boolean =
+      !this.eventSubscriptionDictionary[eventName] ||
+      Object.keys(this.eventSubscriptionDictionary[eventName]).length === 0;
+    if (noSubscribersForEventExist) {
+      return;
+    }
+
+    const eventSubscriptions: SubscriberCollection = this.eventSubscriptionDictionary[eventName];
+
+    const subscriptionIds: Array<string> = Object.keys(eventSubscriptions);
+
+    for (const subscribtionId of subscriptionIds) {
+      const subscription: IInternalSubscription = eventSubscriptions[subscribtionId];
+      invokeEventCallback(eventName, payload, subscription.callback);
+
+      if (subscription.subscribeOnce) {
+        delete this.eventSubscriptionDictionary[eventName][subscribtionId];
+      }
+    }
+  }
+
+  public unsubscribe(subscription: Subscription): void {
+    delete this.eventSubscriptionDictionary[subscription.eventName][subscription.id];
+  }
+
+  private _createSubscription(event: string, callback: EventReceivedCallback, subscribeOnce: boolean): Subscription {
 
     if (!event) {
-      throw new Error('event was invalid.');
+      throw new BadRequestError('No event name provided for the subscription!');
     }
 
-    if (typeof event === 'string') {
-      subscribers = this.eventLookup[event];
-      if (subscribers) {
-        subscribers = subscribers.slice();
-        i = subscribers.length;
-
-        while (i--) {
-          invokeCallback(subscribers[i], data, event);
-        }
-      }
-    } else {
-      subscribers = this.messageHandlers.slice();
-      i = subscribers.length;
-
-      while (i--) {
-        invokeHandler(subscribers[i], event);
-      }
-    }
-  }
-
-  public subscribe(event: string | Function, callback: Function): ISubscription {
-    let handler;
-    let subscribers;
-
-    if (!event) {
-      throw new Error('Event channel/type was invalid.');
+    if (!callback) {
+      throw new BadRequestError('No callback function provided for the subscription!');
     }
 
-    if (typeof event === 'string') {
-      handler = callback;
-      subscribers = this.eventLookup[event] || (this.eventLookup[event] = []);
-    } else {
-      handler = new Handler(event, callback);
-      subscribers = this.messageHandlers;
+    const subscriptionId: string = uuid.v4();
+    const newSubscription: Subscription = new Subscription(subscriptionId, event, subscribeOnce);
+
+    const eventIsNotYetRegistered: boolean = !this.eventSubscriptionDictionary[event];
+    if (eventIsNotYetRegistered) {
+      this.eventSubscriptionDictionary[event] = {};
     }
 
-    subscribers.push(handler);
-
-    return {
-      dispose() {
-        const index = subscribers.indexOf(handler);
-        if (index !== -1) {
-          subscribers.splice(index, 1);
-        }
-      },
-    };
-  }
-
-  public subscribeOnce(event: string | Function, callback: Function): ISubscription {
-
-    const subscription = this.subscribe(event, (a, b) => {
-      subscription.dispose();
-
-      return callback(a, b);
-    });
-
-    return subscription;
-  }
-
-  public createEntityEvent(data: any,
-                           source: any,
-                           metadataOptions?: {[key: string]: any},
-                          ): IEntityEvent {
-
-    const metadata = this._createEventMetadata(metadataOptions);
-
-    const message = {
-      metadata: metadata,
-      data: data,
-      source: source,
+    this.eventSubscriptionDictionary[event][subscriptionId] = <IInternalSubscription> {
+      subscribeOnce: subscribeOnce,
+      callback: callback,
     };
 
-    return message;
-  }
-
-  private _createEventMetadata(metadataOptions?: { [key: string]: any }): IEventMetadata {
-
-    const metadata: IEventMetadata = {
-      id: uuid.v4(),
-      options: metadataOptions,
-    };
-
-    return metadata;
+    return newSubscription;
   }
 }
 
-function invokeCallback(callback, data, event) {
+/**
+ * Triggers the given callback directly with the next process tick.
+ * This makes event publishing as instantaneously as it can be with NodeJs.
+ *
+ * @param eventName    The event name.
+ * @param eventPayload The event payload.
+ * @param callback     The function to trigger.
+ */
+function invokeEventCallback(eventName: string, eventPayload: any, callback: Function): void {
   process.nextTick(() => {
     try {
-      callback(data, event);
+      callback(eventPayload, eventName);
     } catch (e) {
-      debugError(e);
+      logger.error(e);
     }
   });
-
-}
-
-function invokeHandler(handler, data) {
-  process.nextTick(() => {
-    try {
-      handler.handle(data);
-    } catch (e) {
-      debugError(e);
-    }
-  });
-}
-
-class Handler {
-
-  private messageType;
-  private callback;
-
-  constructor(messageType, callback) {
-    this.messageType = messageType;
-    this.callback = callback;
-  }
-
-  public handle(message) {
-    if (message instanceof this.messageType) {
-      this.callback.call(null, message);
-    }
-  }
 }
