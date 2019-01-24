@@ -16,7 +16,7 @@
     "@essential-projects/errors_ts": "~1.4.2",
     "@essential-projects/event_aggregator_contracts": "~4.0.0",
     "loggerhythm": "^3.0.3",
-    "uuid": "~3.3.2"
+    "node-uuid": "~1.4.8"
   },
   "devDependencies": {
     "@essential-projects/tslint-config": "^1.1.3",
