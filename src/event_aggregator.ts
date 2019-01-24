@@ -1,5 +1,5 @@
 import {Logger} from 'loggerhythm';
-import * as uuid from 'uuid';
+import * as uuid from 'node-uuid';
 
 import {BadRequestError} from '@essential-projects/errors_ts';
 import {EventReceivedCallback, IEventAggregator, Subscription} from '@essential-projects/event_aggregator_contracts';
