@@ -3,7 +3,7 @@
   "publishConfig": {
     "registry": "https://www.npmjs.com"
   },
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "components for the internal messagebus",
   "license": "MIT",
   "main": "dist/commonjs/index.js",
