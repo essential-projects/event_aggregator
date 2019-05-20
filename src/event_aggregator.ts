@@ -4,37 +4,37 @@ import * as uuid from 'node-uuid';
 import {BadRequestError} from '@essential-projects/errors_ts';
 import {EventReceivedCallback, IEventAggregator, Subscription} from '@essential-projects/event_aggregator_contracts';
 
-import {EventSubscriptionDictionary, IInternalSubscription, SubscriberCollection} from './internal_types';
+import {EventSubscriptionDictionary} from './internal_types';
 
-const logger: Logger = Logger.createLogger('essential-projects:event_aggregator');
+const logger = Logger.createLogger('essential-projects:event_aggregator');
 
 export class EventAggregator implements IEventAggregator {
 
   private eventSubscriptionDictionary: EventSubscriptionDictionary = {};
 
   public subscribe(eventName: string, callback: EventReceivedCallback): Subscription {
-    return this._createSubscription(eventName, callback, false);
+    return this.createSubscription(eventName, callback, false);
   }
 
   public subscribeOnce(eventName: string, callback: EventReceivedCallback): Subscription {
-    return this._createSubscription(eventName, callback, true);
+    return this.createSubscription(eventName, callback, true);
   }
 
   public publish(eventName: string, payload?: any): void {
 
-    const noSubscribersForEventExist: boolean =
-      !this.eventSubscriptionDictionary[eventName] ||
-      Object.keys(this.eventSubscriptionDictionary[eventName]).length === 0;
+    const noSubscribersForEventExist = !this.eventSubscriptionDictionary[eventName] ||
+                                       Object.keys(this.eventSubscriptionDictionary[eventName]).length === 0;
+
     if (noSubscribersForEventExist) {
       return;
     }
 
-    const eventSubscriptions: SubscriberCollection = this.eventSubscriptionDictionary[eventName];
+    const eventSubscriptions = this.eventSubscriptionDictionary[eventName];
 
-    const subscriptionIds: Array<string> = Object.keys(eventSubscriptions);
+    const subscriptionIds = Object.keys(eventSubscriptions);
 
     for (const subscribtionId of subscriptionIds) {
-      const subscription: IInternalSubscription = eventSubscriptions[subscribtionId];
+      const subscription = eventSubscriptions[subscribtionId];
       invokeEventCallback(eventName, payload, subscription.callback);
 
       if (subscription.subscribeOnce) {
@@ -47,7 +47,7 @@ export class EventAggregator implements IEventAggregator {
     delete this.eventSubscriptionDictionary[subscription.eventName][subscription.id];
   }
 
-  private _createSubscription(event: string, callback: EventReceivedCallback, subscribeOnce: boolean): Subscription {
+  private createSubscription(event: string, callback: EventReceivedCallback, subscribeOnce: boolean): Subscription {
 
     if (!event) {
       throw new BadRequestError('No event name provided for the subscription!');
@@ -57,21 +57,22 @@ export class EventAggregator implements IEventAggregator {
       throw new BadRequestError('No callback function provided for the subscription!');
     }
 
-    const subscriptionId: string = uuid.v4();
-    const newSubscription: Subscription = new Subscription(subscriptionId, event, subscribeOnce);
+    const subscriptionId = uuid.v4();
+    const newSubscription = new Subscription(subscriptionId, event, subscribeOnce);
 
-    const eventIsNotYetRegistered: boolean = !this.eventSubscriptionDictionary[event];
+    const eventIsNotYetRegistered = !this.eventSubscriptionDictionary[event];
     if (eventIsNotYetRegistered) {
       this.eventSubscriptionDictionary[event] = {};
     }
 
-    this.eventSubscriptionDictionary[event][subscriptionId] = <IInternalSubscription> {
+    this.eventSubscriptionDictionary[event][subscriptionId] = {
       subscribeOnce: subscribeOnce,
       callback: callback,
     };
 
     return newSubscription;
   }
+
 }
 
 /**
@@ -83,7 +84,7 @@ export class EventAggregator implements IEventAggregator {
  * @param callback     The function to trigger.
  */
 function invokeEventCallback(eventName: string, eventPayload: any, callback: Function): void {
-  process.nextTick(() => {
+  process.nextTick((): void => {
     try {
       callback(eventPayload, eventName);
     } catch (e) {
