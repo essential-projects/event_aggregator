@@ -14,8 +14,8 @@
     "Sebastian Meier <sebastian.meier@5minds.de>"
   ],
   "dependencies": {
-    "@essential-projects/errors_ts": "feature~change_to_eslint_and_tsc",
-    "@essential-projects/event_aggregator_contracts": "feature~change_to_eslint_and_tsc",
+    "@essential-projects/errors_ts": "^1.5.0",
+    "@essential-projects/event_aggregator_contracts": "^4.1.0",
     "loggerhythm": "~3.0.3",
     "node-uuid": "~1.4.8"
   },
