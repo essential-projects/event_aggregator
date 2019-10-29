@@ -4,13 +4,13 @@ import * as uuid from 'node-uuid';
 import {BadRequestError} from '@essential-projects/errors_ts';
 import {EventReceivedCallback, IEventAggregator, Subscription} from '@essential-projects/event_aggregator_contracts';
 
-import {EventSubscriptionDictionary} from './internal_types';
+import {IEventSubscriptionDictionary} from './internal_types';
 
 const logger = Logger.createLogger('essential-projects:event_aggregator');
 
 export class EventAggregator implements IEventAggregator {
 
-  private eventSubscriptionDictionary: EventSubscriptionDictionary = {};
+  private eventSubscriptionDictionary: IEventSubscriptionDictionary = {};
 
   public subscribe(eventName: string, callback: EventReceivedCallback): Subscription {
     return this.createSubscription(eventName, callback, false);
