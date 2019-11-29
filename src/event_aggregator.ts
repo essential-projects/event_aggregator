@@ -22,14 +22,12 @@ export class EventAggregator implements IEventAggregator {
 
   public publish(eventName: string, payload?: any): void {
 
-    const noSubscribersForEventExist = !this.eventSubscriptionDictionary[eventName] ||
-                                       Object.keys(this.eventSubscriptionDictionary[eventName]).length === 0;
+    const eventSubscriptions = this.eventSubscriptionDictionary[eventName];
 
+    const noSubscribersForEventExist = !eventSubscriptions || Object.keys(eventSubscriptions).length === 0;
     if (noSubscribersForEventExist) {
       return;
     }
-
-    const eventSubscriptions = this.eventSubscriptionDictionary[eventName];
 
     const subscriptionIds = Object.keys(eventSubscriptions);
 
@@ -44,6 +42,9 @@ export class EventAggregator implements IEventAggregator {
   }
 
   public unsubscribe(subscription: Subscription): void {
+    if (subscription == undefined) {
+      return;
+    }
     delete this.eventSubscriptionDictionary[subscription.eventName][subscription.id];
   }
 

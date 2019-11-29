@@ -1,8 +1,7 @@
 import {EventReceivedCallback} from '@essential-projects/event_aggregator_contracts';
 
 /**
- * Internal type for grouping all EventSubscriptions by the event to which
- * they have subscribed.
+ * Internal interface for grouping all EventSubscriptions by the event to which they have subscribed.
  *
  * Syntax looks like this:
  * {
@@ -27,7 +26,7 @@ import {EventReceivedCallback} from '@essential-projects/event_aggregator_contra
 export interface IEventSubscriptionDictionary {[eventName: string]: ISubscriberCollection}
 
 /**
- * Internal type for grouping together multiple subscriptions for a specific event.
+ * Internal interface for grouping together multiple subscriptions for a specific event.
  */
 export interface ISubscriberCollection {[subscriberId: string]: IInternalSubscription}
 
