@@ -42,7 +42,7 @@ export class EventAggregator implements IEventAggregator {
   }
 
   public unsubscribe(subscription: Subscription): void {
-    if (subscription == undefined) {
+    if (subscription == undefined || !this.eventSubscriptionDictionary[subscription?.eventName]) {
       return;
     }
     delete this.eventSubscriptionDictionary[subscription.eventName][subscription.id];
